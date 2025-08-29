@@ -1,3 +1,10 @@
+pydantic-settings
+environs
 aiohttp-jinja2~=1.6
 Jinja2~=3.1.6
 aiohttp~=3.12.15
+alembic
+sqlalchemy
+pydantic
+pydantic-setting
+asyncpg
