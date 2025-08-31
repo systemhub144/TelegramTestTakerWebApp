@@ -5,17 +5,15 @@ from sqlalchemy.ext.asyncio import AsyncAttrs, create_async_engine, async_sessio
 from datetime import datetime
 from sqlalchemy import Integer, func
 
-from ..config import load_config
+from app.config import load_config
 
 CONFIG = load_config()
 DATABASE_URL = CONFIG.db.get_db_url()
 
-engine = create_async_engine(url=DATABASE_URL)
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
+    __table_args__ = {'extend_existing': True}
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
@@ -30,6 +28,7 @@ class AnswerTypeEnum(str, enum.Enum):
     CLOSE = "close"
     OPEN = "open"
 
+
 class CloseAnswerEnum(str, enum.Enum):
     A = "A"
     B = "B"
@@ -37,3 +36,19 @@ class CloseAnswerEnum(str, enum.Enum):
     D = "D"
     E = "E"
     F = "F"
+
+
+def connection(method):
+    engine = create_async_engine(url=DATABASE_URL)
+    async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+    async def wrapper(*args, **kwargs):
+        async with async_session_maker() as session:
+            try:
+                return await method(*args, session=session, **kwargs)
+            except Exception as e:
+                await session.rollback()
+                raise e
+            finally:
+                await session.close()
+
+    return wrapper
