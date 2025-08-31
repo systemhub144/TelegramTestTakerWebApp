@@ -22,7 +22,7 @@ class Test(Base):
 class User(Base):
     username: Mapped[str] = mapped_column(String(50), nullable=False)
     city: Mapped[str] = mapped_column(String(50), nullable=False)
-    user_id: Mapped[int] = mapped_column(nullable=False, unique=True)
+    user_id: Mapped[int] = mapped_column(nullable=False)
 
     def __repr__(self):
         return f'<User {self.user_id}>'
@@ -31,7 +31,7 @@ class User(Base):
 class TestAttempt(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     test_id: Mapped[int] = mapped_column(ForeignKey('tests.id'))
-    score: Mapped[int] = mapped_column(default=0)
+    score: Mapped[float] = mapped_column(default=0)
     wrong_answers: Mapped[int] = mapped_column(default=0)
     correct_answers: Mapped[int] = mapped_column(default=0)
     started_at: Mapped[datetime]
@@ -46,6 +46,7 @@ class Answer(Base):
     question_type: Mapped[AnswerTypeEnum] = mapped_column(nullable=False)
     correct_answer: Mapped[CloseAnswerEnum | str] = mapped_column(String(150), nullable=False)
     test_id: Mapped[int] = mapped_column(ForeignKey('tests.id'))
+    score: Mapped[float] = mapped_column(default=1.0)
 
     def __repr__(self):
         return f'<Answer question_number={self.question_number} test={self.test_id}>'

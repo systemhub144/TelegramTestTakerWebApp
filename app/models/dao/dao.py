@@ -29,7 +29,8 @@ class TestDAO(BaseDAO):
                 question_number=answer_data['question_number'],
                 question_type=answer_data['question_type'],
                 correct_answer=answer_data['correct_answer'],
-                test_id=test.id
+                test_id=test.id,
+                score=answer_data['score'],
             )
             session.add(answer)
 
@@ -65,7 +66,7 @@ class UserDAO(BaseDAO):
             user_answer = user_test_data['answers'][answer.question_number - 1]
             if answer.correct_answer == user_answer:
                 test_results['correct_answers'] += 1
-                test_results['score'] += 1
+                test_results['score'] += answer.score
             else:
                 test_results['wrong_answers'] += 1
 
